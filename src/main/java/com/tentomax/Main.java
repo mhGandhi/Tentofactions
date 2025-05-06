@@ -1,12 +1,13 @@
 package com.tentomax;
 
-import com.tentomax.commands.AllyChatCommand;
-import com.tentomax.commands.DefaultChatCommand;
-import com.tentomax.commands.TeamChatCommand;
-import com.tentomax.commands.TeamCommand;
+import com.mojang.brigadier.CommandDispatcher;
+import com.tentomax.commands.*;
 import com.tentomax.listeners.ChatListener;
 import com.tentomax.listeners.PvPListener;
 import com.tentomax.managers.TeamManager;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -42,14 +43,16 @@ public final class Main extends JavaPlugin {
         instance = this;
         TeamManager.loadTeams();
 
+        getServer().getPluginManager().registerEvents(new PvPListener(), this);
+        getServer().getPluginManager().registerEvents(new ChatListener(), this);
 
+        //todo replace with brigadeer
         getCommand("tentoteam").setExecutor(new TeamCommand());
         getCommand("teamchat").setExecutor(new TeamChatCommand());
         getCommand("allychat").setExecutor(new AllyChatCommand());
         getCommand("defaultchat").setExecutor(new DefaultChatCommand());
 
-        getServer().getPluginManager().registerEvents(new PvPListener(), this);
-        getServer().getPluginManager().registerEvents(new ChatListener(), this);
+        this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, BrigadierCommands::register);
 
         getLogger().info("Tentofactions enabled.");
     }
