@@ -1,0 +1,31 @@
+teams:
+  TEAM1:
+    name: TEAM1
+    prefix: TEAM1
+    color: WHITE
+    private: true
+  team1:
+    name: team1
+    prefix: COKC
+    color: WHITE
+    private: true
+  3ee:
+    name: 3ee
+    prefix: 3ee
+    color: WHITE
+    private: true
+  sdasd:
+    name: sdasd
+    prefix: EEE
+    color: WHITE
+    private: true
+  sds:
+    name: sds
+    prefix: sds
+    color: WHITE
+    private: true
+  Ddfsdf:
+    name: Ddfsdf
+    prefix: Ddfsdf
+    color: WHITE
+    private: true

@@ -1,0 +1,16 @@
+name: Tentofactions
+version: '1.0'
+main: com.tentomax.Main
+api-version: '1.21'
+authors: [ Adrian ]
+description: Teams
+website: tentomax.com
+commands:
+  tentoteam:
+    description: Control Team
+  teamchat:
+    description: Toggle team chat mode
+  allychat:
+    description: Toggle ally chat mode
+  defaultchat:
+    description: Toggle default chat mode

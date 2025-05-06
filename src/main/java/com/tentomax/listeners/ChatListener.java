@@ -1,0 +1,52 @@
+package com.tentomax.listeners;
+
+import com.tentomax.Main;
+import com.tentomax.managers.TeamManager;
+import com.tentomax.models.ChatMode;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import com.tentomax.models.Team;
+
+import java.util.UUID;
+
+public class ChatListener implements Listener {
+    @EventHandler
+    public void onPlayerChat(AsyncPlayerChatEvent event) {
+
+        Player player = event.getPlayer();
+        ChatMode mode = TeamManager.getChatMode(player.getUniqueId());
+
+        if (mode == ChatMode.PUBLIC) return;
+
+        Team team = TeamManager.getPlayersTeam(player.getUniqueId());
+        if (team == null) return;
+
+        event.setCancelled(true);
+        String message = team.getColor() + "[" + team.getPrefix() + "] " + player.getName() + ": " + event.getMessage();
+
+        if (mode == ChatMode.TEAM) {
+            for (UUID memberId : team.getMembers()) {
+                Player member = Bukkit.getPlayer(memberId);
+                if (member != null) member.sendMessage(message);
+            }
+        } else if (mode == ChatMode.ALLY) {
+            for (UUID memberId : team.getMembers()) {
+                Player member = Bukkit.getPlayer(memberId);
+                if (member != null) member.sendMessage(message);
+            }
+            for (Team allyTeam : team.getAllies()) {
+                if (allyTeam != null) {
+                    for (UUID memberId : allyTeam.getMembers()) {
+                        Player member = Bukkit.getPlayer(memberId);
+                        if (member != null) member.sendMessage(message);
+                    }
+                }
+            }
+        }
+    }
+
+}

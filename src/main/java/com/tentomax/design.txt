@@ -1,0 +1,74 @@
+Kernfeatures:
+    -Teams
+    -Teams können sich verbünden
+
+    -Team chat
+    -Ally chat
+
+Teamattribute:
+    -name -> Team Name für Identifikation
+    -prefix -> vor namen angezeigt
+    -farbe -> farbe für prefix
+    -private -> ob eine beitrittsanfrage angenommen werden muss
+
+PVP modi pro team (können an oder aus sein):
+    -global PVP -> mitglieder des teams können niemanden angreifen und nicht angegriffen werden (default on)
+    -team pvp -> mitglieder des teams können sich nicht untereinander angreifen (default off)
+    -ally pvp -> mitglieder des teams können keine verbündeten teams angreifen und nicht von verbündeten teams angegriffen werden (default off)
+
+Rollen innerhalb des teams:
+
+Member:
+    - kann nichts besonderes
+Elder:
+    - alles was Member kann
+    - Kann Beitrittsanfragen akzeptieren
+Grand Duke:
+    - alles was Elder kann
+    - Kann team mit anderen verbünden benutzen
+    - kann member mit niedrigerem rang kicken
+    - kann member zu elder promoten
+    - kann team PVP togglen
+Owner:
+    - alles was Grand Duke kann
+    - kann ally PVP togglen
+    - kann global PVP togglen
+    - Kann member zu grand Duke promoten
+    - kann Teamattribute ändern
+
+Commands:
+    -/team create [name]
+    -/team join [team]//wenn nicht public wird anfrage geschickt
+    -/team leave
+    -/team kick [player]
+
+    -Teamattribute ändern
+    -/team modify [attribute] [value]
+    
+    -Anfragen annehmen oder ablehnen
+    -/team accept [player]
+    -/team reject [player]
+
+
+
+TeamAlliance/
+├── src/
+│   └── main/
+│       ├── java/
+│       │   └── me/teamalliance/
+│       │       ├── TeamAlliance.java
+│       │       ├── commands/
+│       │       │   ├── TeamCommand.java
+│       │       ├── models/
+│       │       │   ├── Team.java
+│       │       │   ├── TeamRole.java
+│       │       │   ├── PvPMode.java
+│       │       ├── managers/
+│       │       │   ├── TeamManager.java
+│       │       │   ├── ChatManager.java
+│       │       ├── listeners/
+│       │       │   ├── PvPListener.java
+│       │       └── utils/
+│       │           └── ChatUtil.java
+│       └── resources/
+│           └── plugin.yml
