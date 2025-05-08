@@ -22,18 +22,17 @@ public class ChatListener implements Listener {
         Player player = event.getPlayer();
         Team team = TeamManager.getPlayersTeam(player.getUniqueId());
         if (team == null) return;
-        String message = team.getColor() + "[" + team.getPrefix() + "] " + event.getMessage();
+        event.setCancelled(true);
+
+        String message = team.getColor() + "[" + team.getPrefix() + "]"+ChatColor.WHITE+" <"+ player.getName() +"> "+ event.getMessage();
 
         ChatMode mode = ChatManager.getChatMode(player.getUniqueId());
 
         if (mode == ChatMode.PUBLIC){
-            event.setMessage(message);
-            return;
+            for(Player p : Bukkit.getServer().getOnlinePlayers()){
+                p.sendMessage(message);
+            }
         }
-
-        message = "<"+ player.getName() +"> "+ message;
-
-        event.setCancelled(true);
 
         if (mode == ChatMode.TEAM) {
             message = "(Team)"+message;

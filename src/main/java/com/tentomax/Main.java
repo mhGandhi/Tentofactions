@@ -24,6 +24,7 @@ public final class Main extends JavaPlugin {
     tablist
 
     check if teams exist on startup
+    modify better
     */
 
     @Override

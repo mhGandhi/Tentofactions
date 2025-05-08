@@ -19,6 +19,7 @@ public class ChatCommand {
 
         if(TeamManager.playerInTeam(player)){
             ChatManager.setChatMode(player.getUniqueId(), chatMode);
+            player.sendMessage("chat mode switched to "+chatMode);
             return 1;
         }else{
             player.sendMessage(ChatColor.RED+"You are not in a team.");
