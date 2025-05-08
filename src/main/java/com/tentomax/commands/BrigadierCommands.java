@@ -2,7 +2,6 @@ package com.tentomax.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.tentomax.Main;
 import com.tentomax.models.ChatMode;
@@ -66,7 +65,7 @@ public class BrigadierCommands {
 
 
 
-    public static final String TCL = "tteam";
+    public static final String TCL = "tentoteam";
     private static LiteralCommandNode<CommandSourceStack> buildTeamCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal(TCL)
 

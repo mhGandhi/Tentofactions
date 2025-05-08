@@ -10,7 +10,7 @@ public enum TeamRole {
     public final String string;
     public final int rank;
 
-    private TeamRole(Privilege[] pPrivileges, String pString){
+    TeamRole(Privilege[] pPrivileges, String pString){
         this.privileges = pPrivileges;
         this.string = pString;
         rank = this.ordinal();

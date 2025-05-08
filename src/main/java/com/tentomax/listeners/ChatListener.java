@@ -1,6 +1,5 @@
 package com.tentomax.listeners;
 
-import com.tentomax.Main;
 import com.tentomax.managers.ChatManager;
 import com.tentomax.managers.TeamManager;
 import com.tentomax.models.ChatMode;

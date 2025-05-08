@@ -3,7 +3,6 @@ package com.tentomax.commands;
 import com.tentomax.managers.ChatManager;
 import com.tentomax.managers.TeamManager;
 import com.tentomax.models.ChatMode;
-import com.tentomax.models.Team;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
