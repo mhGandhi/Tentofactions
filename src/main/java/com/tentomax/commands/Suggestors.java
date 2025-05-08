@@ -1,6 +1,5 @@
 package com.tentomax.commands;
 
-import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
@@ -13,7 +12,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -21,11 +19,23 @@ import java.util.stream.Collectors;
 
 public class Suggestors {
 
-    private static final SuggestionProvider<CommandSourceStack> allTeamsSuggestor = (context, builder) -> {
+    private static final SuggestionProvider<CommandSourceStack> otherTeamsSuggestor = (context, builder) -> {
+        Team team = null;
+        CommandSourceStack source = context.getSource();
+        if ((source.getExecutor() instanceof Player player)) {
+            team = TeamManager.getPlayersTeam(player.getUniqueId());
+        }
 
-        for(String key : TeamManager.getTeams().keySet()){
-            if(key.toLowerCase().startsWith(builder.getRemaining().toLowerCase()))
-                builder.suggest(key);
+        if (team == null) {
+            for(String key : TeamManager.getTeams().keySet()){
+                if(key.toLowerCase().startsWith(builder.getRemaining().toLowerCase()))
+                    builder.suggest(key);
+            }
+        }else{
+            for(String key : TeamManager.getTeams().keySet()){
+                if((!key.equals(team.getName())) && key.toLowerCase().startsWith(builder.getRemaining().toLowerCase()))
+                    builder.suggest(key);
+            }
         }
 
         return CompletableFuture.completedFuture(builder.build());
@@ -134,8 +144,8 @@ public class Suggestors {
     };
 
 
-    public static SuggestionProvider<CommandSourceStack> getAllTeamsSuggestor() {
-        return allTeamsSuggestor;
+    public static SuggestionProvider<CommandSourceStack> getOtherTeamsSuggestor() {
+        return otherTeamsSuggestor;
     }
 
     public static SuggestionProvider<CommandSourceStack> getOneRankLessSuggestor() {
