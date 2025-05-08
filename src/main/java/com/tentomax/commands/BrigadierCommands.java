@@ -171,8 +171,8 @@ public class BrigadierCommands {
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("modify")
                         .then(Commands.argument("key", StringArgumentType.word())//todo arg types
+                                .suggests(getTeamAttributesSuggestor())
                                 .then(Commands.argument("value", StringArgumentType.word())
-                                        .suggests(getTeamAttributesSuggestor())
                                         .executes(ctx -> {
                                             return handleCommand(
                                                     ctx.getSource(),
