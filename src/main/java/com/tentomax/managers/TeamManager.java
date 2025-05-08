@@ -20,9 +20,7 @@ public class TeamManager {
 
     public static boolean playerInTeam(Player pPlayer){
         for (Team tm : teams.values()) {
-            for(UUID uuid : tm.getMembers()){
-                if(uuid == pPlayer.getUniqueId())return true;
-            }
+            if(tm.getMembers().contains(pPlayer.getUniqueId()))return true;
         }
         return false;
     }
