@@ -62,6 +62,7 @@ public class TeamCommand {
 
         playerTeam.removeMember(uuid);
         TeamManager.setChatMode(player.getUniqueId(), ChatMode.PUBLIC);
+        playerTeam.setRole(uuid, TeamRole.MEMBER);
         if(broadcastMessage){
             player.sendMessage("Left team");
             playerTeam.sendMessage(player.getName()+" left team");
