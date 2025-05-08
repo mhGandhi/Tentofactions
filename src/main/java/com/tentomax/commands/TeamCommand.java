@@ -68,6 +68,8 @@ public class TeamCommand {
     public static void modifyAttribute(Player player, String attr, String value) throws CException {
         Team playerTeam = assertTeam(player);
 
+        if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.ATTRIBUTES))throw new CException("You do not have attribute privileges");
+
         TeamAttributes ta = TeamAttributes.byCommand(attr.toLowerCase());
         if(ta == null) throw new CException(attr+" not a valid attribute");
 

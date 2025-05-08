@@ -4,7 +4,7 @@ public enum TeamRole {
     MEMBER(p(), "member"),
     ELDER(p(Privilege.ACCEPTING), "elder"),
     GRAND_DUKE(p(Privilege.ACCEPTING, Privilege.KICKING, Privilege.ALLY), "grandduke"),
-    OWNER(p(Privilege.ACCEPTING, Privilege.KICKING, Privilege.ALLY), "owner");
+    OWNER(p(Privilege.ACCEPTING, Privilege.KICKING, Privilege.ALLY, Privilege.ATTRIBUTES), "owner");
 
     private final Privilege[] privileges;
     public final String string;
