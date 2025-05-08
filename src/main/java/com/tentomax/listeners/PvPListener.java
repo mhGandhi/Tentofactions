@@ -35,31 +35,7 @@ public class PvPListener implements Listener {
             if (attacker == null) return;
         }
 
-        if (attacker.equals(victim)) return;
-
-        Team attackerTeam = TeamManager.getPlayersTeam(attacker.getUniqueId());
-        Team victimTeam = TeamManager.getPlayersTeam(victim.getUniqueId());
-
-        if (attackerTeam == null && victimTeam == null){
-            return;
-        }
-
-        if((attackerTeam!=null && !attackerTeam.isGlobalPvP())||(victimTeam!=null && !victimTeam.isGlobalPvP())){
-            event.setCancelled(true);
-            return;
-        }
-
-        if (attackerTeam == victimTeam && !attackerTeam.isTeamPvP()) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (attackerTeam.getAllies().contains(victimTeam.getName()) && !attackerTeam.isAllyPvP()) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (!attackerTeam.isGlobalPvP() || !victimTeam.isGlobalPvP()) {
+        if (!pvpBetween(attacker, victim)) {
             event.setCancelled(true);
         }
     }
@@ -68,34 +44,10 @@ public class PvPListener implements Listener {
     public void onWolfTarget(EntityTargetLivingEntityEvent event) {
         if (!(event.getEntity() instanceof Wolf wolf)) return;
         if (!wolf.isTamed()) return;
-        if (!(event.getTarget() instanceof Player targetPlayer)) return;
-        if (!(wolf.getOwner() instanceof Player owner)) return;
+        if (!(event.getTarget() instanceof Player victim)) return;
+        if (!(wolf.getOwner() instanceof Player attacker)) return;
 
-        UUID ownerUUID = owner.getUniqueId();
-        UUID targetUUID = targetPlayer.getUniqueId();
-
-        Team ownerTeam = TeamManager.getPlayersTeam(ownerUUID);
-        Team targetTeam = TeamManager.getPlayersTeam(targetUUID);
-
-        // Cancel if PVP is disallowed in this context
-        if (ownerTeam == null && targetTeam == null) return;
-
-        if ((ownerTeam != null && !ownerTeam.isGlobalPvP()) ||
-                (targetTeam != null && !targetTeam.isGlobalPvP())) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (ownerTeam == targetTeam && !ownerTeam.isTeamPvP()) {
-            event.setCancelled(true);
-            return;
-        }
-
-        if (ownerTeam != null && targetTeam != null &&
-                ownerTeam.getAllies().contains(targetTeam.getName()) &&
-                !ownerTeam.isAllyPvP()) {
-            event.setCancelled(true);
-        }
+        if(!pvpBetween(attacker, victim))event.setCancelled(true);
     }
 
 
@@ -106,5 +58,34 @@ public class PvPListener implements Listener {
             }
         }
         return null;
+    }
+
+    private static boolean pvpBetween(Player attacker, Player victim){//todo verify
+        if (attacker.equals(victim)) return true;
+
+        Team attackerTeam = TeamManager.getPlayersTeam(attacker.getUniqueId());
+        Team victimTeam = TeamManager.getPlayersTeam(victim.getUniqueId());
+
+        if (attackerTeam == null && victimTeam == null){
+            return true;
+        }
+
+        if((attackerTeam!=null && !attackerTeam.isGlobalPvP())||(victimTeam!=null && !victimTeam.isGlobalPvP())){
+            return false;
+        }
+
+        if (attackerTeam == victimTeam && !attackerTeam.isTeamPvP()) {
+            return false;
+        }
+
+        if (attackerTeam.getAllies().contains(victimTeam.getName()) && !attackerTeam.isAllyPvP()) {
+            return false;
+        }
+
+        if (!attackerTeam.isGlobalPvP() || !victimTeam.isGlobalPvP()) {
+            return false;
+        }
+
+        return true;
     }
 }
