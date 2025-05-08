@@ -9,8 +9,7 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-import static com.tentomax.managers.TeamManager.getAllies;
-import static com.tentomax.managers.TeamManager.isAlly;
+import static com.tentomax.managers.TeamManager.*;
 
 public class TeamCommand {
 
@@ -49,6 +48,7 @@ public class TeamCommand {
 
         }
         pTeam.addMember(player.getUniqueId());
+        updateNameTag(player);
     }
 
     public static void leaveTeam(Player player, boolean broadcastMessage) throws CException {//todo sepereate to tryleave and leave
@@ -62,6 +62,7 @@ public class TeamCommand {
             player.sendMessage("Left team");
             playerTeam.sendMessage(player.getName()+" left team");
         }
+        updateNameTag(player);
     }
 
     public static void modifyAttribute(Player player, String attr, String value) throws CException {
@@ -76,11 +77,13 @@ public class TeamCommand {
             switch (ta) {
                 case PREFIX:
                     playerTeam.setPrefix(value);
+                    updateNameTag(playerTeam);
                     break;
                 case COLOR:
                     ChatColor col = CColor.byCommand(value);
                     if(col == null) throw new CException("accepts: "+CColor.allColsString());
                     playerTeam.setColor(col);
+                    updateNameTag(playerTeam);
                     break;
                 case PRIVATE:
                     playerTeam.setPrivate(parseBool(value));

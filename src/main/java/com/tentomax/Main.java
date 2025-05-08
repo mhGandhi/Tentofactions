@@ -23,7 +23,6 @@ public final class Main extends JavaPlugin {
     /*todo
     tablist
 
-    check if teams exist on startup
     modify better
     */
 

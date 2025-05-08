@@ -1,7 +1,10 @@
 package com.tentomax.managers;
 
 import com.tentomax.models.Team;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.*;
 
@@ -46,5 +49,34 @@ public class TeamManager {
         }
 
         return ret;
+    }
+
+
+    public static void updateNameTag(Player player) {
+        Team team = getPlayersTeam(player.getUniqueId());
+        if(team == null)return;
+
+        String prefix = team.getColor()+team.getPrefix()+ChatColor.RESET;
+
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        String iTeamName = "prefix_" + player.getName(); // Unique team name for each player
+
+        org.bukkit.scoreboard.Team iTeam = scoreboard.getTeam(iTeamName);
+        if (iTeam == null) {
+            iTeam = scoreboard.registerNewTeam(iTeamName);
+        }
+
+        iTeam.setPrefix(prefix);
+        iTeam.addEntry(player.getName());
+
+        // Make sure the team is applied to the player (though usually the main scoreboard is active)
+        player.setScoreboard(scoreboard);
+    }
+
+    public static void updateNameTag(Team pTeam) {
+        pTeam.getMembers().stream().forEach((uuid)->{
+            Player p = Bukkit.getServer().getPlayer(uuid);
+            if(p!=null)updateNameTag(p);
+        });
     }
 }

@@ -124,7 +124,11 @@ public class PersistenceManager {
                 }
             }
 
-            TeamManager.getTeams().put(name, team);
+            if(team.getMembers().isEmpty()){
+                Bukkit.getLogger().warning("Team "+name+" is empty and will not be loaded");
+            }else{
+                TeamManager.getTeams().put(name, team);
+            }
         }
     }
 

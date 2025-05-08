@@ -11,10 +11,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import com.tentomax.models.Team;
+import org.bukkit.event.player.PlayerJoinEvent;
 
 import java.util.UUID;
 
 import static com.tentomax.managers.TeamManager.getAllies;
+import static com.tentomax.managers.TeamManager.updateNameTag;
 
 public class ChatListener implements Listener {
     @EventHandler
@@ -24,7 +26,7 @@ public class ChatListener implements Listener {
         if (team == null) return;
         event.setCancelled(true);
 
-        String message = team.getColor() + "[" + team.getPrefix() + "]"+ChatColor.WHITE+" <"+ player.getName() +"> "+ event.getMessage();
+        String message = team.getColor() + "[" + team.getPrefix() + "]"+ChatColor.RESET+" <"+ player.getName() +"> "+ event.getMessage();
 
         ChatMode mode = ChatManager.getChatMode(player.getUniqueId());
 
@@ -55,6 +57,12 @@ public class ChatListener implements Listener {
                 }
             }
         }
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        updateNameTag(player);
     }
 
 }
