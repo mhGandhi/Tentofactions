@@ -52,14 +52,15 @@ public class TeamManager {
     }
 
 
+    //todo dumm, so viele teams aber hihi
     public static void updateNameTag(Player player) {
         Team team = getPlayersTeam(player.getUniqueId());
         if(team == null)return;
 
-        String prefix = team.getColor()+team.getPrefix()+ChatColor.RESET;
+        String prefix = team.getColor()+"["+team.getPrefix()+"] "+ChatColor.RESET;
 
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-        String iTeamName = "prefix_" + player.getName(); // Unique team name for each player
+        String iTeamName = "prefix_" + player.getUniqueId(); // Unique team name for each player
 
         org.bukkit.scoreboard.Team iTeam = scoreboard.getTeam(iTeamName);
         if (iTeam == null) {
