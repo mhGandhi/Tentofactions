@@ -82,18 +82,22 @@ public class TeamCommand {
                     playerTeam.setColor(col);
                     break;
                 case PRIVATE:
-                    if(value.equalsIgnoreCase("false")){
-                        playerTeam.setPrivate(false);
-                    } else if (value.equalsIgnoreCase("true")) {
-                        playerTeam.setPrivate(true);
-                    }else{
-                        throw new Exception();
-                    }
-                    //team.setPrivate(Boolean.parseBoolean(value));
+                    playerTeam.setPrivate(parseBool(value));
+                    //playerTeam.setPrivate(Boolean.parseBoolean(value));
+                    break;
+                case TEAM_PVP:
+                    playerTeam.setTeamPvP(parseBool(value));
+                    break;
+                case ALLY_PVP:
+                    playerTeam.setAllyPvP(parseBool(value));
+                    break;
+                case GLOBAL_PVP:
+                    playerTeam.setGlobalPvP(parseBool(value));
                     break;
                 default:
                     throw new CException(attr+" change via command not supported");
             }
+            player.sendMessage(ChatColor.GREEN+attr+" set to "+value);
         }catch(Exception e){
             if(e instanceof CException ce){
                 throw ce;
@@ -228,6 +232,15 @@ public class TeamCommand {
         //todo
     }
 
+    private static boolean parseBool(String pBool)throws Exception{
+        if(pBool.equalsIgnoreCase("false")){
+            return false;
+        } else if (pBool.equalsIgnoreCase("true")) {
+            return true;
+        }else{
+            throw new Exception();
+        }
+    }
 
     private static Team assertTeam(Player pPlayer)throws CException{
         Team team = TeamManager.getPlayersTeam(pPlayer.getUniqueId());

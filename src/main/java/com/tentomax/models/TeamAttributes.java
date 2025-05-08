@@ -7,7 +7,10 @@ import java.util.Objects;
 public enum TeamAttributes {
     PREFIX("prefix"),
     COLOR("color"),
-    PRIVATE("private");
+    PRIVATE("private"),
+    GLOBAL_PVP("globalpvp"),
+    TEAM_PVP("teampvp"),
+    ALLY_PVP("allypvp");
 
     public final String command;
     private TeamAttributes(String pCommand){
