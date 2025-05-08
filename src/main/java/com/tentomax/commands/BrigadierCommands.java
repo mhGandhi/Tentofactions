@@ -225,8 +225,6 @@ public class BrigadierCommands {
         void execute(Player player) throws CException;
     }
 
-
-
     private static int handleCommand(CommandSourceStack ctx, Command command) {
         if (!(ctx.getSender() instanceof Player player)) {
             return mustBePlayer(ctx);
