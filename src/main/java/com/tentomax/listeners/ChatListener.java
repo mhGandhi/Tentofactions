@@ -1,6 +1,7 @@
 package com.tentomax.listeners;
 
 import com.tentomax.Main;
+import com.tentomax.managers.ChatManager;
 import com.tentomax.managers.TeamManager;
 import com.tentomax.models.ChatMode;
 import org.bukkit.Bukkit;
@@ -21,7 +22,7 @@ public class ChatListener implements Listener {
         if (team == null) return;
         String message = team.getColor() + "[" + team.getPrefix() + "] " + event.getMessage();
 
-        ChatMode mode = TeamManager.getChatMode(player.getUniqueId());
+        ChatMode mode = ChatManager.getChatMode(player.getUniqueId());
 
         if (mode == ChatMode.PUBLIC){
             event.setMessage(message);

@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.tentomax.commands.*;
 import com.tentomax.listeners.ChatListener;
 import com.tentomax.listeners.PvPListener;
+import com.tentomax.managers.PersistenceManager;
 import com.tentomax.managers.TeamManager;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -21,10 +22,12 @@ public final class Main extends JavaPlugin {
 
     /*todo
     tablist
+
     ally commands
     pvp commands
 
     bessere info
+
     persistence
     check if teams exist on startup
     */
@@ -32,7 +35,7 @@ public final class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        TeamManager.loadTeams();
+        PersistenceManager.loadTeams();
 
         getServer().getPluginManager().registerEvents(new PvPListener(), this);
         getServer().getPluginManager().registerEvents(new ChatListener(), this);
@@ -44,7 +47,7 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        TeamManager.saveTeams();
+        PersistenceManager.saveTeams();
     }
 
     public static Main getInstance() {

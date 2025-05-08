@@ -1,5 +1,6 @@
 package com.tentomax.commands;
 
+import com.tentomax.managers.ChatManager;
 import com.tentomax.managers.TeamManager;
 import com.tentomax.models.ChatMode;
 import com.tentomax.models.Team;
@@ -17,7 +18,7 @@ public class ChatCommand {
         }
 
         if(TeamManager.playerInTeam(player)){
-            TeamManager.setChatMode(player.getUniqueId(), chatMode);
+            ChatManager.setChatMode(player.getUniqueId(), chatMode);
             return 1;
         }else{
             player.sendMessage(ChatColor.RED+"You are not in a team.");

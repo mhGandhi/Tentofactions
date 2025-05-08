@@ -17,6 +17,9 @@ public class Team {
     private Set<Team> allies = new HashSet<>();
     private Set<UUID> joinRequests = new HashSet<>();
     private Map<UUID, TeamRole> roles = new HashMap<>();
+    public Map<UUID,TeamRole> getRoles(){
+        return this.roles;
+    }
 
     private boolean globalPvP = true;
     private boolean teamPvP = false;

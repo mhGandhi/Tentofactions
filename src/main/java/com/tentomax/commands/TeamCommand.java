@@ -1,6 +1,7 @@
 package com.tentomax.commands;
 
 import com.tentomax.Main;
+import com.tentomax.managers.ChatManager;
 import com.tentomax.managers.TeamManager;
 import com.tentomax.models.*;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -59,7 +60,7 @@ public class TeamCommand {
         if (playerTeam == null) throw new CException("Player not in any team");
 
         playerTeam.removeMember(uuid);
-        TeamManager.setChatMode(player.getUniqueId(), ChatMode.PUBLIC);
+        ChatManager.setChatMode(player.getUniqueId(), ChatMode.PUBLIC);
         playerTeam.setRole(uuid, TeamRole.MEMBER);
         if(broadcastMessage){
             player.sendMessage("Left team");
