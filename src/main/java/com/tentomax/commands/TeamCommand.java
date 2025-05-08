@@ -17,8 +17,6 @@ public class TeamCommand {
 
     public static void createTeam(Player creator, String name) throws CException {
 
-        Main.getInstance().getLogger().info("CREATING TEAM "+ name);
-
         if(TeamManager.playerInTeam(creator)) throw new CException("Already in a Team");
         if (TeamManager.getTeams().containsKey(name)) throw new CException("Team \""+name+"\" already exists");
 

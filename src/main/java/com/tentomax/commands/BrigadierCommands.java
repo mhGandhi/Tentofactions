@@ -2,9 +2,12 @@ package com.tentomax.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
+import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.tentomax.Main;
+import com.tentomax.managers.TeamManager;
 import com.tentomax.models.ChatMode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -16,10 +19,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;
 import static com.tentomax.commands.ChatCommand.setChat;
+import static com.tentomax.commands.Suggestors.*;
 import static com.tentomax.commands.TeamCommand.*;
 
 public class BrigadierCommands {
@@ -63,6 +69,9 @@ public class BrigadierCommands {
         return player;
     }
 
+
+
+
     private static final String TCL = "tteam";
     private static LiteralCommandNode<CommandSourceStack> buildTeamCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal(TCL)
@@ -81,13 +90,14 @@ public class BrigadierCommands {
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("join")
                         .then(Commands.argument("team", StringArgumentType.word())
+                                .suggests(getAllTeamsSuggestor())
                                         .executes(ctx -> {
                                             return handleCommand(
                                             ctx.getSource(),
                                             (player)-> joinTeam(player, getString(ctx, "team")));
                                         })
                         )
-                                .executes(ctx -> missingArg(ctx.getSource()))//todo teams
+                                .executes(ctx -> missingArg(ctx.getSource()))
                         )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("leave")
@@ -106,6 +116,7 @@ public class BrigadierCommands {
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("kick")
                         .then(Commands.argument("player", StringArgumentType.word())//todo player below in team
+                                .suggests(getOneRankLessSuggestor())
                                 .executes(ctx -> {
                                     return handleCommand(
                                             ctx.getSource(),
@@ -116,6 +127,7 @@ public class BrigadierCommands {
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("accept")
                         .then(Commands.argument("player", StringArgumentType.word())//todo player with request
+                                .suggests(getRequestedSuggestor())
                                 .executes(ctx -> {
                                     return handleCommand(
                                             ctx.getSource(),
@@ -126,6 +138,7 @@ public class BrigadierCommands {
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("reject")
                         .then(Commands.argument("player", StringArgumentType.word())//todo player with request
+                                .suggests(getRequestedSuggestor())
                                 .executes(ctx -> {
                                     return handleCommand(
                                             ctx.getSource(),
@@ -136,6 +149,7 @@ public class BrigadierCommands {
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("promote")
                         .then(Commands.argument("player", StringArgumentType.word())//todo 2xbelow in team
+                                .suggests(getTwoRankLessSuggestor())
                                 .executes(ctx -> {
                                     return handleCommand(
                                             ctx.getSource(),
@@ -146,6 +160,7 @@ public class BrigadierCommands {
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("demote")
                         .then(Commands.argument("player", StringArgumentType.word())//todo below in team
+                                .suggests(getOneRankLessSuggestor())
                                 .executes(ctx -> {
                                     return handleCommand(
                                             ctx.getSource(),
@@ -157,6 +172,7 @@ public class BrigadierCommands {
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("modify")
                         .then(Commands.argument("key", StringArgumentType.word())//todo arg types
                                 .then(Commands.argument("value", StringArgumentType.word())
+                                        .suggests(getTeamAttributesSuggestor())
                                         .executes(ctx -> {
                                             return handleCommand(
                                                     ctx.getSource(),
@@ -197,8 +213,6 @@ public class BrigadierCommands {
         if (!(ctx.getSender() instanceof Player player)) {
             return mustBePlayer(ctx);
         }
-
-        Main.getInstance().getLogger().info("HANDLING COMMAND FOR "+ player.getName());
 
         try {
             command.execute(player);
