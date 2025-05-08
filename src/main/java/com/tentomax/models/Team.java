@@ -14,7 +14,7 @@ public class Team {
     private boolean isPrivate;
 
     private Set<UUID> members = new HashSet<>();
-    private Set<Team> allies = new HashSet<>();
+    private Set<String> alliesByName = new HashSet<>();
     private Set<UUID> joinRequests = new HashSet<>();
     private Map<UUID, TeamRole> roles = new HashMap<>();
     public Map<UUID,TeamRole> getRoles(){
@@ -41,7 +41,7 @@ public class Team {
     public boolean isAllyPvP() { return allyPvP; }
 
     public Set<UUID> getMembers() { return members; }
-    public Set<Team> getAllies() { return allies; }
+    public Set<String> getAlliesByName() { return alliesByName; }
     public Set<UUID> getJoinRequests() { return joinRequests; }
 
     public TeamRole getRole(UUID pUUID){

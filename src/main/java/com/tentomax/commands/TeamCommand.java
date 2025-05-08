@@ -1,17 +1,16 @@
 package com.tentomax.commands;
 
-import com.tentomax.Main;
 import com.tentomax.managers.ChatManager;
 import com.tentomax.managers.TeamManager;
 import com.tentomax.models.*;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-import static com.tentomax.commands.BrigadierCommands.mustBePlayer;
+import static com.tentomax.managers.TeamManager.getAllies;
+import static com.tentomax.managers.TeamManager.isAlly;
 
 public class TeamCommand {
 
@@ -168,19 +167,39 @@ public class TeamCommand {
     public static void info(Player player) throws CException {
         Team playerTeam = assertTeam(player);
 
-        String ret = playerTeam.getColor()+"Name -> "+playerTeam.getName()
-                +"\nPrefix -> "+playerTeam.getPrefix()
-                +"\nPrivate -> "+playerTeam.isPrivate()
-                +"\nPlayers:\n";
+        StringBuilder ret = new StringBuilder(playerTeam.getColor() + "Team Info:\n");
+        ret.append("Name -> ").append(playerTeam.getName()).append("\n");
+        ret.append("Prefix -> ").append(playerTeam.getPrefix()).append("\n");
+        ret.append("Private -> ").append(playerTeam.isPrivate()).append("\n");
+        ret.append("PVP: [global: ").append(playerTeam.isGlobalPvP())
+                .append("] [team: ").append(playerTeam.isTeamPvP())
+                .append("] [ally: ").append(playerTeam.isAllyPvP()).append("]\n");
 
-        for(UUID member : playerTeam.getMembers()){
+        ret.append("Players:\n");
+        for (UUID member : playerTeam.getMembers()) {
             Player pl = Bukkit.getPlayer(member);
-            if(pl!=null)
-                ret+=pl.getName()+" - "+playerTeam.getRole(pl.getUniqueId());
+            if (pl != null) {
+                ret.append(" - ").append(pl.getName())
+                        .append(" (").append(playerTeam.getRole(pl.getUniqueId())).append(")\n");
+            }
         }
 
-        player.sendMessage(ret);
+        ret.append("Join Requests:\n");
+        for (UUID request : playerTeam.getJoinRequests()) {
+            Player pl = Bukkit.getPlayer(request);
+            if (pl != null) {
+                ret.append(" - ").append(pl.getName()).append("\n");
+            }
+        }
+
+        ret.append("Allies:\n");
+        for (Team team : getAllies(playerTeam)) {
+            ret.append(" - ").append(team.getName()).append("\n");
+        }
+
+        player.sendMessage(ret.toString());
     }
+
 
     public static void accept(Player player, String pTarget) throws CException{
         Team playerTeam = assertTeam(player);
@@ -222,7 +241,17 @@ public class TeamCommand {
 
         if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.ALLY))throw new CException("You do not have allying privileges.");
 
-        //todo
+        if(playerTeam.getAlliesByName().contains(targetTeam.getName()))throw new CException(targetTeam+" is already on ally list");
+
+        playerTeam.getAlliesByName().add(targetTeam.getName());
+        player.sendMessage("Added "+targetTeam+" to allies");
+
+        if(isAlly(playerTeam, targetTeam)){
+            playerTeam.sendMessage(targetTeam+" is now an ally");
+            targetTeam.sendMessage(playerTeam+" is now an ally");
+        }else{
+            targetTeam.sendMessage(playerTeam+" added you to their allies - add them back to become their ally ["+BrigadierCommands.TCL+" ally "+playerTeam+"]", Privilege.ALLY);
+        }
     }
 
     public static void unAllyTeam(Player player, String pTeam) throws CException{
@@ -231,7 +260,17 @@ public class TeamCommand {
 
         if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.ALLY))throw new CException("You do not have allying privileges.");
 
-        //todo
+        if(!playerTeam.getAlliesByName().contains(targetTeam.getName()))throw new CException(targetTeam+" is not on ally list");
+
+        boolean alliesBefore = isAlly(playerTeam,targetTeam);
+
+        playerTeam.getAlliesByName().remove(targetTeam);
+        player.sendMessage("Removed "+targetTeam+" from allies");
+
+        if(alliesBefore){
+            playerTeam.sendMessage(targetTeam+" is no longer an ally");
+            targetTeam.sendMessage(playerTeam+" is no longer an ally");
+        }
     }
 
     private static boolean parseBool(String pBool)throws Exception{

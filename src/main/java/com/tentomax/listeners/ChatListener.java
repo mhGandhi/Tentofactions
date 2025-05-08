@@ -14,6 +14,8 @@ import com.tentomax.models.Team;
 
 import java.util.UUID;
 
+import static com.tentomax.managers.TeamManager.getAllies;
+
 public class ChatListener implements Listener {
     @EventHandler
     public void onPlayerChat(AsyncPlayerChatEvent event) {
@@ -45,7 +47,7 @@ public class ChatListener implements Listener {
                 Player member = Bukkit.getPlayer(memberId);
                 if (member != null) member.sendMessage(message);
             }
-            for (Team allyTeam : team.getAllies()) {
+            for (Team allyTeam : getAllies(team)) {
                 if (allyTeam != null) {
                     for (UUID memberId : allyTeam.getMembers()) {
                         Player member = Bukkit.getPlayer(memberId);

@@ -1,15 +1,8 @@
 package com.tentomax.managers;
 
-import com.tentomax.commands.CException;
-import com.tentomax.models.ChatMode;
 import com.tentomax.models.Team;
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 public class TeamManager {
@@ -39,5 +32,19 @@ public class TeamManager {
 
     public static Map<String, Team> getTeams() {
         return teams;
+    }
+
+    public static boolean isAlly(Team t1, Team t2){
+        return (t1.getAlliesByName().contains(t2.getName()) && t2.getAlliesByName().contains(t1.getName()));
+    }
+
+    public static Set<Team> getAllies(Team pTeam){
+        Set<Team> ret = new HashSet<>();
+
+        for(Team t : getTeams().values()){
+            if(isAlly(pTeam, t))ret.add(t);
+        }
+
+        return ret;
     }
 }

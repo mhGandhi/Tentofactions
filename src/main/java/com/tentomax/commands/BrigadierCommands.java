@@ -66,9 +66,14 @@ public class BrigadierCommands {
 
 
 
-    private static final String TCL = "tteam";
+    public static final String TCL = "tteam";
     private static LiteralCommandNode<CommandSourceStack> buildTeamCommand() {
         return LiteralArgumentBuilder.<CommandSourceStack>literal(TCL)
+
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("help")
+                        .executes(ctx -> help(ctx.getSource()))
+                )
+
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("create")
                         .then(Commands.argument("name", StringArgumentType.word())
                                 .executes(ctx -> {
@@ -99,7 +104,8 @@ public class BrigadierCommands {
                             return handleCommand(
                                     ctx.getSource(),
                                     (player)-> leaveTeam(player, true));
-                        }))
+                        })
+                )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("info")
                         .executes(ctx -> {
@@ -109,7 +115,7 @@ public class BrigadierCommands {
                         }))
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("kick")
-                        .then(Commands.argument("player", StringArgumentType.word())//todo player below in team
+                        .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(getOneRankLessSuggestor())
                                 .executes(ctx -> {
                                     return handleCommand(
@@ -120,7 +126,7 @@ public class BrigadierCommands {
                         )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("accept")
-                        .then(Commands.argument("player", StringArgumentType.word())//todo player with request
+                        .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(getRequestedSuggestor())
                                 .executes(ctx -> {
                                     return handleCommand(
@@ -131,7 +137,7 @@ public class BrigadierCommands {
                 )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("reject")
-                        .then(Commands.argument("player", StringArgumentType.word())//todo player with request
+                        .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(getRequestedSuggestor())
                                 .executes(ctx -> {
                                     return handleCommand(
@@ -142,7 +148,7 @@ public class BrigadierCommands {
                 )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("promote")
-                        .then(Commands.argument("player", StringArgumentType.word())//todo 2xbelow in team
+                        .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(getTwoRankLessSuggestor())
                                 .executes(ctx -> {
                                     return handleCommand(
@@ -153,7 +159,7 @@ public class BrigadierCommands {
                 )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("demote")
-                        .then(Commands.argument("player", StringArgumentType.word())//todo below in team
+                        .then(Commands.argument("player", StringArgumentType.word())
                                 .suggests(getOneRankLessSuggestor())
                                 .executes(ctx -> {
                                     return handleCommand(
@@ -172,6 +178,10 @@ public class BrigadierCommands {
                                                     (player)-> allyTeam(player, getString(ctx, "team")));
                                         })
                                 )
+                                .executes(ctx -> {
+                                    ctx.getSource().getExecutor().sendMessage(ChatColor.YELLOW+"Use to add a team to your List of allies - for anything to take effect, both teams must add the other to their allies");
+                                    return 0;
+                                })
                         //.executes(ctx -> missingArg(ctx.getSource()))
                 )
 
@@ -188,7 +198,7 @@ public class BrigadierCommands {
                 )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("modify")
-                        .then(Commands.argument("key", StringArgumentType.word())//todo arg types
+                        .then(Commands.argument("key", StringArgumentType.word())
                                 .suggests(getTeamAttributesSuggestor())
                                 .then(Commands.argument("value", StringArgumentType.word())
                                         .executes(ctx -> {
@@ -204,10 +214,7 @@ public class BrigadierCommands {
                 )
 
                 // Show usage if /team is run with no args
-                .executes(ctx -> {
-                    sendDetailedSubcommandHelp(ctx.getSource(), ctx.getRootNode(), TCL);
-                    return 0;
-                })
+                .executes(ctx -> help(ctx.getSource()))
                 .build();
     }
 
@@ -239,43 +246,22 @@ public class BrigadierCommands {
         return 1;
     }
 
+    private static int help(CommandSourceStack source){
+        source.getExecutor().sendMessage(ChatColor.YELLOW
+                +"create [team] --> creates a new team"
+                +"\njoin [team] --> join a team or send request"
+                +"\nleave --> leave your current team"
+                +"\nkick [player] --> kick a player from your team"
+                +"\nmodify [attribute] [value] --> modify a team attribute"
+                +"\naccept [player] --> accept a player join-request"
+                +"\nreject [player] --> reject a player join-request"
+                +"\npromote [player] --> promotes a player"
+                +"\ndemote [player] --> demotes a player"
+                +"\nally [team] --> add a team to your teams allies"
+                +"\nunally [team] --> remove a team from your teams allies"
+                +"\ninfo --> shows info about your team"
+        );
 
-    private static final Map<String, String> TEAM_COMMAND_DESCRIPTIONS = new HashMap<>();
-
-    static {
-        TEAM_COMMAND_DESCRIPTIONS.put("create", "Creates a new team");
-        TEAM_COMMAND_DESCRIPTIONS.put("join", "Join a team or send join request");
-        TEAM_COMMAND_DESCRIPTIONS.put("leave", "Leave your current team");
-        TEAM_COMMAND_DESCRIPTIONS.put("kick", "Kick a member from your team");
-        TEAM_COMMAND_DESCRIPTIONS.put("modify", "Modify a team attribute");
-        TEAM_COMMAND_DESCRIPTIONS.put("accept", "Accept a join request");
-        TEAM_COMMAND_DESCRIPTIONS.put("reject", "Reject a join request");
-        TEAM_COMMAND_DESCRIPTIONS.put("promote", "Promote a team member");
-        TEAM_COMMAND_DESCRIPTIONS.put("demote", "Demote a team member");
-        TEAM_COMMAND_DESCRIPTIONS.put("info", "View your team's info");
-    }
-
-    public static void sendDetailedSubcommandHelp(CommandSourceStack source, CommandNode<CommandSourceStack> root, String commandName) {
-        StringBuilder sb = new StringBuilder("Usage: /").append(commandName).append("\n");
-//todo fix
-        for (CommandNode<CommandSourceStack> child : root.getChildren()) {
-            if (child instanceof LiteralCommandNode<CommandSourceStack> literal) {
-                String name = literal.getName();
-                sb.append(" - ").append(name);
-
-                for (CommandNode<CommandSourceStack> arg : literal.getChildren()) {
-                    sb.append(" <").append(arg.getName()).append(">");
-                }
-
-                String description = TEAM_COMMAND_DESCRIPTIONS.getOrDefault(name, "");
-                if (!description.isEmpty()) {
-                    sb.append(" : ").append(description);
-                }
-
-                sb.append("\n");
-            }
-        }
-
-        source.getSender().sendMessage(Component.text(sb.toString()).color(NamedTextColor.YELLOW));
+        return 0;
     }
 }

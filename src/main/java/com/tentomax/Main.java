@@ -23,12 +23,6 @@ public final class Main extends JavaPlugin {
     /*todo
     tablist
 
-    ally commands
-    pvp commands
-
-    bessere info
-
-    persistence
     check if teams exist on startup
     */
 

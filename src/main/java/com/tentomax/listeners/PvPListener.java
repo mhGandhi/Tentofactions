@@ -12,6 +12,8 @@ import org.bukkit.event.entity.EntityTargetLivingEntityEvent;
 
 import java.util.UUID;
 
+import static com.tentomax.managers.TeamManager.getAllies;
+
 public class PvPListener implements Listener {
 
     public PvPListener() {
@@ -78,7 +80,7 @@ public class PvPListener implements Listener {
             return false;
         }
 
-        if (attackerTeam.getAllies().contains(victimTeam.getName()) && !attackerTeam.isAllyPvP()) {
+        if (getAllies(attackerTeam).contains(victimTeam.getName()) && !attackerTeam.isAllyPvP()) {
             return false;
         }
 
