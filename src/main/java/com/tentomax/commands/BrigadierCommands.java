@@ -2,12 +2,9 @@ package com.tentomax.commands;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.suggestion.SuggestionProvider;
-import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import com.tentomax.Main;
-import com.tentomax.managers.TeamManager;
 import com.tentomax.models.ChatMode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -19,11 +16,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
-import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;
 import static com.tentomax.commands.ChatCommand.setChat;
 import static com.tentomax.commands.Suggestors.*;
 import static com.tentomax.commands.TeamCommand.*;
@@ -84,21 +78,21 @@ public class BrigadierCommands {
                                             (player)-> createTeam(player, getString(ctx, "name")));
                                 })
                         )
-                        .executes(ctx -> missingArg(ctx.getSource()))
+                        //.executes(ctx -> missingArg(ctx.getSource()))
                 )
 
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("join")
                         .then(Commands.argument("team", StringArgumentType.word())
-                                .suggests(getAllTeamsSuggestor())
+                                .suggests(getOtherTeamsSuggestor())
                                         .executes(ctx -> {
                                             return handleCommand(
                                             ctx.getSource(),
                                             (player)-> joinTeam(player, getString(ctx, "team")));
                                         })
                         )
-                                .executes(ctx -> missingArg(ctx.getSource()))
-                        )
+                                //.executes(ctx -> missingArg(ctx.getSource()))
+                )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("leave")
                         .executes(ctx -> {
@@ -122,7 +116,7 @@ public class BrigadierCommands {
                                             ctx.getSource(),
                                             (player)-> kick(player, getString(ctx, "player")));
                                 })
-                        ).executes(ctx -> missingArg(ctx.getSource()))
+                        )//.executes(ctx -> missingArg(ctx.getSource()))
                         )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("accept")
@@ -133,7 +127,7 @@ public class BrigadierCommands {
                                             ctx.getSource(),
                                             (player)-> accept(player, getString(ctx, "player")));
                                 })
-                        ).executes(ctx -> missingArg(ctx.getSource()))
+                        )//.executes(ctx -> missingArg(ctx.getSource()))
                 )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("reject")
@@ -144,7 +138,7 @@ public class BrigadierCommands {
                                             ctx.getSource(),
                                             (player)-> reject(player, getString(ctx, "player")));
                                 })
-                        ).executes(ctx -> missingArg(ctx.getSource()))
+                        )//.executes(ctx -> missingArg(ctx.getSource()))
                 )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("promote")
@@ -155,7 +149,7 @@ public class BrigadierCommands {
                                             ctx.getSource(),
                                             (player)-> promoteMember(player, getString(ctx, "player")));
                                 })
-                        ).executes(ctx -> missingArg(ctx.getSource()))
+                        )//.executes(ctx -> missingArg(ctx.getSource()))
                 )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("demote")
@@ -166,7 +160,31 @@ public class BrigadierCommands {
                                             ctx.getSource(),
                                             (player)-> demoteMember(player, getString(ctx, "player")));
                                 })
-                        ).executes(ctx -> missingArg(ctx.getSource()))
+                        )//.executes(ctx -> missingArg(ctx.getSource()))
+                )
+
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("ally")
+                                .then(Commands.argument("team", StringArgumentType.word())
+                                        .suggests(getOtherTeamsSuggestor())
+                                        .executes(ctx -> {
+                                            return handleCommand(
+                                                    ctx.getSource(),
+                                                    (player)-> allyTeam(player, getString(ctx, "team")));
+                                        })
+                                )
+                        //.executes(ctx -> missingArg(ctx.getSource()))
+                )
+
+                .then(LiteralArgumentBuilder.<CommandSourceStack>literal("unally")
+                                .then(Commands.argument("team", StringArgumentType.word())
+                                        .suggests(getOtherTeamsSuggestor())
+                                        .executes(ctx -> {
+                                            return handleCommand(
+                                                    ctx.getSource(),
+                                                    (player)-> unAllyTeam(player, getString(ctx, "team")));
+                                        })
+                                )
+                        //.executes(ctx -> missingArg(ctx.getSource()))
                 )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("modify")
@@ -180,9 +198,9 @@ public class BrigadierCommands {
                                             );
                                         })
                                 )
-                                .executes(ctx -> missingArg(ctx.getSource()))
+                                //.executes(ctx -> missingArg(ctx.getSource()))
                         )
-                        .executes(ctx -> missingArg(ctx.getSource()))
+                        //.executes(ctx -> missingArg(ctx.getSource()))
                 )
 
                 // Show usage if /team is run with no args

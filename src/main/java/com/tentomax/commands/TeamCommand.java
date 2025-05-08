@@ -17,7 +17,6 @@ public class TeamCommand {
 
 
     public static void createTeam(Player creator, String name) throws CException {
-
         if(TeamManager.playerInTeam(creator)) throw new CException("Already in a Team");
         if (TeamManager.getTeams().containsKey(name)) throw new CException("Team \""+name+"\" already exists");
 
@@ -32,8 +31,7 @@ public class TeamCommand {
     public static void joinTeam(Player player, String teamName) throws CException {
         if(TeamManager.playerInTeam(player))throw new CException("Already in a Team");
 
-        Team team = TeamManager.getTeams().get(teamName);
-        if (team == null) throw new CException("Team \""+teamName+"\" doesn't exists");
+        Team team = assertTeam(teamName);
 
         if (team.isPrivate()) {
             team.getJoinRequests().add(player.getUniqueId());
@@ -56,8 +54,7 @@ public class TeamCommand {
 
     public static void leaveTeam(Player player, boolean broadcastMessage) throws CException {//todo sepereate to tryleave and leave
         UUID uuid = player.getUniqueId();
-        Team playerTeam = TeamManager.getPlayersTeam(uuid);
-        if (playerTeam == null) throw new CException("Player not in any team");
+        Team playerTeam = assertTeam(player);
 
         playerTeam.removeMember(uuid);
         ChatManager.setChatMode(player.getUniqueId(), ChatMode.PUBLIC);
@@ -69,28 +66,26 @@ public class TeamCommand {
     }
 
     public static void modifyAttribute(Player player, String attr, String value) throws CException {
-        Team team = TeamManager.getPlayersTeam(player.getUniqueId());
-        if (team == null) throw new CException("Player not in any team");
+        Team playerTeam = assertTeam(player);
 
         TeamAttributes ta = TeamAttributes.byCommand(attr.toLowerCase());
-
         if(ta == null) throw new CException(attr+" not a valid attribute");
 
         try{
             switch (ta) {
                 case PREFIX:
-                    team.setPrefix(value);
+                    playerTeam.setPrefix(value);
                     break;
                 case COLOR:
                     ChatColor col = CColor.byCommand(value);
                     if(col == null) throw new CException("accepts: "+CColor.allColsString());
-                    team.setColor(col);
+                    playerTeam.setColor(col);
                     break;
                 case PRIVATE:
                     if(value.equalsIgnoreCase("false")){
-                        team.setPrivate(false);
+                        playerTeam.setPrivate(false);
                     } else if (value.equalsIgnoreCase("true")) {
-                        team.setPrivate(true);
+                        playerTeam.setPrivate(true);
                     }else{
                         throw new Exception();
                     }
@@ -109,118 +104,142 @@ public class TeamCommand {
     }
 
     public static void promoteMember(Player player, String pTarget) throws CException {
-        Team team = TeamManager.getPlayersTeam(player.getUniqueId());
-        if (team == null) throw new CException("Not in a Team");
+        Team playerTeam = assertTeam(player);
 
         Player target = player.getServer().getPlayer(pTarget);
         if(target==null) throw new CException("Player "+pTarget+" not found!");
 
-        if (!team.isMember(target.getUniqueId())) throw new CException(pTarget+" not in your team");
+        if (!playerTeam.isMember(target.getUniqueId())) throw new CException(pTarget+" not in your team");
 
-        assertOutranksByTwo(team, player, target);
+        assertOutranksByTwo(playerTeam, player, target);
 
 
-        int currentRank = team.getRole(target.getUniqueId()).rank;
+        int currentRank = playerTeam.getRole(target.getUniqueId()).rank;
         TeamRole targetRole = TeamRole.byRank(currentRank+1);
 
         if(targetRole == null) throw new CException("Please, it's too much promotion, we can't take it anymore it is too much promotion!");
 
-        team.setRole(target.getUniqueId(), targetRole);
+        playerTeam.setRole(target.getUniqueId(), targetRole);
 
         player.sendMessage(ChatColor.GREEN + "Promoted " + target.getName() + " to "+targetRole+".");
         target.sendMessage(ChatColor.GREEN + "You have been promoted to "+targetRole+".");
     }
 
     public static void demoteMember(Player player, String pTarget) throws CException {
-        Team team = TeamManager.getPlayersTeam(player.getUniqueId());
-        if (team == null) throw new CException("Not in a Team");
+        Team playerTeam = assertTeam(player);
 
         Player target = player.getServer().getPlayer(pTarget);
         if(target==null) throw new CException("Player "+pTarget+" not found!");
 
-        if (!team.isMember(target.getUniqueId())) throw new CException(pTarget+" not in your team");
+        if (!playerTeam.isMember(target.getUniqueId())) throw new CException(pTarget+" not in your team");
 
-        assertOutranks(team, player, target);
+        assertOutranks(playerTeam, player, target);
 
-        team.demoteCompletely(target.getUniqueId()); // Example promotion
+        playerTeam.demoteCompletely(target.getUniqueId()); // Example promotion
         player.sendMessage(ChatColor.GREEN + "Demoted " + target.getName() + ".");
         target.sendMessage(ChatColor.GREEN + "You have been demoted.");
     }
 
     public static void kick(Player player, String pTarget)throws CException {
-        Team team = TeamManager.getPlayersTeam(player.getUniqueId());
-        if (team == null) throw new CException("Not in a Team");
+        Team playerTeam = assertTeam(player);
 
         Player target = player.getServer().getPlayer(pTarget);
         if(target==null) throw new CException("Player "+pTarget+" not found!");
 
         if(target.getUniqueId().equals(player.getUniqueId())) throw new CException("You can't kick yourself.");
 
-        if(!team.isMember(target.getUniqueId())) throw new CException("Player "+pTarget+" not in your team.");
+        if(!playerTeam.isMember(target.getUniqueId())) throw new CException("Player "+pTarget+" not in your team.");
 
-        if(!team.hasPrivilege(player.getUniqueId(), Privilege.KICKING))throw new CException("You do not have kicking privileges");
+        if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.KICKING))throw new CException("You do not have kicking privileges");
 
-        assertOutranks(team, player, target);
+        assertOutranks(playerTeam, player, target);
 
         leaveTeam(player, false);
-        team.sendMessage(ChatColor.GREEN + target.getName() + " has been kicked from the team.");
+        playerTeam.sendMessage(ChatColor.GREEN + target.getName() + " has been kicked from the team.");
         target.sendMessage(ChatColor.RED + "You were kicked from the team.");
     }
 
     public static void info(Player player) throws CException {
-        Team team = TeamManager.getPlayersTeam(player.getUniqueId());
-        if(team == null) throw new CException(ChatColor.GRAY + "Not in any Team");
+        Team playerTeam = assertTeam(player);
 
-        String ret = team.getColor()+"Name -> "+team.getName()
-                +"\nPrefix -> "+team.getPrefix()
-                +"\nPrivate -> "+team.isPrivate()
+        String ret = playerTeam.getColor()+"Name -> "+playerTeam.getName()
+                +"\nPrefix -> "+playerTeam.getPrefix()
+                +"\nPrivate -> "+playerTeam.isPrivate()
                 +"\nPlayers:\n";
 
-        for(UUID member : team.getMembers()){
+        for(UUID member : playerTeam.getMembers()){
             Player pl = Bukkit.getPlayer(member);
             if(pl!=null)
-                ret+=pl.getName()+" - "+team.getRole(pl.getUniqueId());
+                ret+=pl.getName()+" - "+playerTeam.getRole(pl.getUniqueId());
         }
 
         player.sendMessage(ret);
     }
 
     public static void accept(Player player, String pTarget) throws CException{
-        Team team = TeamManager.getPlayersTeam(player.getUniqueId());
-        if (team == null) throw new CException("Not in a team");
+        Team playerTeam = assertTeam(player);
 
-        if(!team.hasPrivilege(player.getUniqueId(), Privilege.ACCEPTING)) throw new CException("You do not have accepting privileges.");
+        if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.ACCEPTING)) throw new CException("You do not have accepting privileges.");
 
         Player target = player.getServer().getPlayer(pTarget);
         if(target==null) throw new CException("Player "+pTarget+" not found.");
 
-        if (team.getJoinRequests().contains(target.getUniqueId())) {
+        if (playerTeam.getJoinRequests().contains(target.getUniqueId())) {
             player.sendMessage(ChatColor.GREEN + "Accepted " + target.getName() + " into the team.");
 
-            team.getJoinRequests().remove(target.getUniqueId());
-            addToTeam(target, team, true);
+            playerTeam.getJoinRequests().remove(target.getUniqueId());
+            addToTeam(target, playerTeam, true);
         } else {
             throw new CException("No join request from "+pTarget+".");
         }
     }
 
     public static void reject(Player player, String pTarget) throws CException{
-        Team team = TeamManager.getPlayersTeam(player.getUniqueId());
-        if (team == null) throw new CException("Not in a team");
+        Team playerTeam = assertTeam(player);
 
-        if(!team.hasPrivilege(player.getUniqueId(), Privilege.ACCEPTING)) throw new CException("You do not have accepting privileges.");
+        if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.ACCEPTING)) throw new CException("You do not have accepting privileges.");
 
         Player target = player.getServer().getPlayer(pTarget);
         if(target==null) throw new CException("Player "+pTarget+" not found.");
 
-        if (team.getJoinRequests().remove(target.getUniqueId())) {
+        if (playerTeam.getJoinRequests().remove(target.getUniqueId())) {
             player.sendMessage(ChatColor.YELLOW + "Rejected " + target.getName() + "'s join request.");
-            target.sendMessage(ChatColor.RED + "Your join request to " + team.getName() + " was rejected.");
+            target.sendMessage(ChatColor.RED + "Your join request to " + playerTeam.getName() + " was rejected.");
         } else {
             throw new CException("No join request from "+pTarget+".");
         }
     }
 
+    public static void allyTeam(Player player, String pTeam) throws CException{
+        Team playerTeam = assertTeam(player);
+        Team targetTeam = assertTeam(pTeam);
+
+        if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.ALLY))throw new CException("You do not have allying privileges.");
+
+        //todo
+    }
+
+    public static void unAllyTeam(Player player, String pTeam) throws CException{
+        Team playerTeam = assertTeam(player);
+        Team targetTeam = assertTeam(pTeam);
+
+        if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.ALLY))throw new CException("You do not have allying privileges.");
+
+        //todo
+    }
+
+
+    private static Team assertTeam(Player pPlayer)throws CException{
+        Team team = TeamManager.getPlayersTeam(pPlayer.getUniqueId());
+        if (team == null) throw new CException("Not in a team");
+        return team;
+    }
+
+    private static Team assertTeam(String pTeam)throws CException{
+        Team targetTeam = TeamManager.getTeams().get(pTeam);
+        if (targetTeam == null) throw new CException("Team \""+pTeam+"\" doesn't exists");
+        return targetTeam;
+    }
 
     private static void assertOutranks(Team pTeam, Player p1, Player p2) throws CException {
         int rankP1 = pTeam.getRole(p1.getUniqueId()).rank;
