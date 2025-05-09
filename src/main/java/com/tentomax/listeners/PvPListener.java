@@ -71,19 +71,19 @@ public class PvPListener implements Listener {
             return true;
         }
 
-        if((attackerTeam!=null && !attackerTeam.isGlobalPvP())||(victimTeam!=null && !victimTeam.isGlobalPvP())){
+        if((attackerTeam!=null && !attackerTeam.isGlobalPvP())||(victimTeam!=null && !victimTeam.isGlobalPvP()))
+            return false;
+
+        if(attackerTeam == null || victimTeam == null)
+            return true;
+
+        if (attackerTeam.getName().equals(victimTeam.getName()) && !attackerTeam.isTeamPvP()) {
             return false;
         }
 
-        if (attackerTeam == victimTeam && !attackerTeam.isTeamPvP()) {
-            return false;
-        }
+        boolean allyPvp = attackerTeam.isAllyPvP() && victimTeam.isAllyPvP();
 
-        if (getAllies(attackerTeam).contains(victimTeam.getName()) && !attackerTeam.isAllyPvP()) {
-            return false;
-        }
-
-        if (!attackerTeam.isGlobalPvP() || !victimTeam.isGlobalPvP()) {
+        if (getAllies(attackerTeam).contains(victimTeam) && !allyPvp) {
             return false;
         }
 
