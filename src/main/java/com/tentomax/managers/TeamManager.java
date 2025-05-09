@@ -53,9 +53,12 @@ public class TeamManager {
     //todo dumm, so viele teams aber hihi
     public static void updateNameTag(Player player) {
         Team team = getPlayersTeam(player.getUniqueId());
-        if(team == null)return;
-
-        String prefix = team.getColor()+"["+team.getPrefix()+"] "+ChatColor.RESET;
+        String prefix;
+        if(team == null){
+            prefix = "";
+        }else{
+            prefix = team.getColor()+"["+team.getPrefix()+"] "+ChatColor.RESET;
+        }
 
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
         String iTeamName = "prefix_" + player.getUniqueId(); // Unique team name for each player

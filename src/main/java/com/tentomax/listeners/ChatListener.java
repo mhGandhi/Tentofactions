@@ -25,7 +25,7 @@ public class ChatListener implements Listener {
         if (team == null) return;
         event.setCancelled(true);
 
-        String message = team.getColor() + "[" + team.getPrefix() + "]"+ChatColor.RESET+" <"+ player.getName() +"> "+ event.getMessage();
+        String message = team.getColor() + "[" + team.getPrefix() + "]"+ChatColor.RESET+" "+ player.getName() +" | "+ event.getMessage();
 
         ChatMode mode = ChatManager.getChatMode(player.getUniqueId());
 
@@ -36,13 +36,13 @@ public class ChatListener implements Listener {
         }
 
         if (mode == ChatMode.TEAM) {
-            message = "(Team)"+message;
+            message = ChatColor.GRAY+"(Team)"+message;
             for (UUID memberId : team.getMembers()) {
                 Player member = Bukkit.getPlayer(memberId);
                 if (member != null) member.sendMessage(message);
             }
         } else if (mode == ChatMode.ALLY) {
-            message = "(Ally)"+message;
+            message = ChatColor.GRAY+"(Ally)"+message;
             for (UUID memberId : team.getMembers()) {
                 Player member = Bukkit.getPlayer(memberId);
                 if (member != null) member.sendMessage(message);

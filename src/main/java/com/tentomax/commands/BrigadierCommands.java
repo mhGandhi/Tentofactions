@@ -110,7 +110,7 @@ public class BrigadierCommands {
                         .executes(ctx -> {
                             return handleCommand(
                                     ctx.getSource(),
-                                    TeamCommand::info);
+                                    TeamCommand::info);//todo for other teams aswell
                         }))
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("kick")

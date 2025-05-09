@@ -95,7 +95,7 @@ public class Suggestors {
 
         for(UUID member : team.getMembers()){
             Player mem = Bukkit.getServer().getPlayer(member);
-            if(member != null && team.getRole(member).rank+1 < playerRole.rank && mem.getName().toLowerCase().startsWith(builder.getRemaining().toLowerCase()))
+            if(member != null && team.getRole(member).rank < (playerRole.rank-1) && mem.getName().toLowerCase().startsWith(builder.getRemaining().toLowerCase()))
                 builder.suggest(mem.getName());
 
         }

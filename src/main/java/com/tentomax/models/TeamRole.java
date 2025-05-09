@@ -3,7 +3,7 @@ package com.tentomax.models;
 public enum TeamRole {
     MEMBER(p(), "member"),
     ELDER(p(Privilege.ACCEPTING), "elder"),
-    GRAND_DUKE(p(Privilege.ACCEPTING, Privilege.KICKING, Privilege.ALLY), "grandduke"),
+    GRAND_DUKE(p(Privilege.ACCEPTING, Privilege.KICKING, Privilege.ALLY, Privilege.ATTRIBUTES), "grandduke"),
     OWNER(p(Privilege.ACCEPTING, Privilege.KICKING, Privilege.ALLY, Privilege.ATTRIBUTES), "owner");
 
     private final Privilege[] privileges;

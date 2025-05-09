@@ -140,6 +140,7 @@ public class TeamCommand {
         if(target==null) throw new CException("Player "+pTarget+" not found!");
 
         if (!playerTeam.isMember(target.getUniqueId())) throw new CException(pTarget+" not in your team");
+        if (player.equals(target)) throw new CException("You can not demote yourself.");
 
         assertOutranks(playerTeam, player, target);
 
@@ -154,7 +155,7 @@ public class TeamCommand {
         Player target = player.getServer().getPlayer(pTarget);
         if(target==null) throw new CException("Player "+pTarget+" not found!");
 
-        if(target.getUniqueId().equals(player.getUniqueId())) throw new CException("You can't kick yourself.");
+        if(target.equals(player)) throw new CException("You can't kick yourself.");
 
         if(!playerTeam.isMember(target.getUniqueId())) throw new CException("Player "+pTarget+" not in your team.");
 
@@ -169,38 +170,8 @@ public class TeamCommand {
 
     public static void info(Player player) throws CException {
         Team playerTeam = assertTeam(player);
-
-        StringBuilder ret = new StringBuilder(playerTeam.getColor() + "Team Info:\n");
-        ret.append("Name -> ").append(playerTeam.getName()).append("\n");
-        ret.append("Prefix -> ").append(playerTeam.getPrefix()).append("\n");
-        ret.append("Private -> ").append(playerTeam.isPrivate()).append("\n");
-        ret.append("PVP: [global: ").append(playerTeam.isGlobalPvP())
-                .append("] [team: ").append(playerTeam.isTeamPvP())
-                .append("] [ally: ").append(playerTeam.isAllyPvP()).append("]\n");
-
-        ret.append("Players:\n");
-        for (UUID member : playerTeam.getMembers()) {
-            Player pl = Bukkit.getPlayer(member);
-            if (pl != null) {
-                ret.append(" - ").append(pl.getName())
-                        .append(" (").append(playerTeam.getRole(pl.getUniqueId())).append(")\n");
-            }
-        }
-
-        ret.append("Join Requests:\n");
-        for (UUID request : playerTeam.getJoinRequests()) {
-            Player pl = Bukkit.getPlayer(request);
-            if (pl != null) {
-                ret.append(" - ").append(pl.getName()).append("\n");
-            }
-        }
-
-        ret.append("Allies:\n");
-        for (Team team : getAllies(playerTeam)) {
-            ret.append(" - ").append(team.getName()).append("\n");
-        }
-
-        player.sendMessage(ret.toString());
+        
+        player.sendMessage(playerTeam.info());
     }
 
 
@@ -243,8 +214,9 @@ public class TeamCommand {
         Team targetTeam = assertTeam(pTeam);
 
         if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.ALLY))throw new CException("You do not have allying privileges.");
-
         if(playerTeam.getAlliesByName().contains(targetTeam.getName()))throw new CException(targetTeam+" is already on ally list");
+
+        if(targetTeam.getName().equals(playerTeam.getName()))throw new CException("Teams may not ally themselves");
 
         playerTeam.getAlliesByName().add(targetTeam.getName());
         player.sendMessage("Added "+targetTeam+" to allies");
@@ -262,7 +234,6 @@ public class TeamCommand {
         Team targetTeam = assertTeam(pTeam);
 
         if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.ALLY))throw new CException("You do not have allying privileges.");
-
         if(!playerTeam.getAlliesByName().contains(targetTeam.getName()))throw new CException(targetTeam+" is not on ally list");
 
         boolean alliesBefore = isAlly(playerTeam,targetTeam);

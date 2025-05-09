@@ -3,9 +3,12 @@ package com.tentomax.models;
 import com.tentomax.managers.TeamManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+
+import static com.tentomax.managers.TeamManager.getAllies;
 
 public class Team {
     private String name;
@@ -117,5 +120,48 @@ public class Team {
                 }
             }
         }
+    }
+
+    public String info(){
+        StringBuilder ret = new StringBuilder(this.getColor() + "Team Info:\n");
+        ret.append("Name -> ").append(this.getName()).append("\n");
+        ret.append("Prefix -> ").append(this.getPrefix()).append("\n");
+        ret.append("Private -> ").append(this.isPrivate()).append("\n");
+        ret.append("PVP: [global: ").append(this.isGlobalPvP())
+                .append("] [team: ").append(this.isTeamPvP())
+                .append("] [ally: ").append(this.isAllyPvP()).append("]\n");
+
+        ret.append("Players:\n");
+        for (UUID member : this.getMembers()) {
+            Player pl = Bukkit.getPlayer(member);
+            if (pl != null) {
+                ret.append(" - ").append(pl.getName())
+                        .append(" (").append(this.getRole(pl.getUniqueId())).append(")\n");
+            }
+        }
+
+        ret.append("Join Requests:\n");
+        for (UUID request : this.getJoinRequests()) {
+            Player pl = Bukkit.getPlayer(request);
+            if (pl != null) {
+                ret.append(" - ").append(pl.getName()).append("\n");
+            }
+        }
+
+        ret.append("Allies:\n");
+        for (Team team : getAllies(this)) {
+            ret.append(" - ").append(team.getName()).append("\n");
+        }
+        ret.append("Pending Allies:\n");
+        for (String team : this.getAlliesByName()) {
+            ret.append(" - ").append(team).append("\n");
+        }
+
+        return ret.toString();
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 }

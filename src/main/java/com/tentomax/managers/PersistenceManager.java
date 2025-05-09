@@ -9,10 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class PersistenceManager {
     //todo check (GPT work)
@@ -64,6 +61,9 @@ public class PersistenceManager {
 
 
     public static void loadTeams() {
+        Set<UUID> addedUsers = new HashSet<>();
+
+
         TeamManager.getTeams().clear();
 
         ConfigurationSection teamsSection = dataConfig.getConfigurationSection("teams");
@@ -73,20 +73,20 @@ public class PersistenceManager {
             ConfigurationSection teamSection = teamsSection.getConfigurationSection(key);
             if (teamSection == null) continue;
 
-            String name = teamSection.getString("name", key);
-            String prefix = teamSection.getString("prefix", name);
+            String teamName = teamSection.getString("name", key);
+            String prefix = teamSection.getString("prefix", teamName);
             String colorString = teamSection.getString("color", "WHITE");
             boolean isPrivate = teamSection.getBoolean("private", true);
             boolean globalPvP = teamSection.getBoolean("globalPvP", true);
             boolean teamPvP = teamSection.getBoolean("teamPvP", false);
             boolean allyPvP = teamSection.getBoolean("allyPvP", false);
 
-            Team team = new Team(name);
+            Team team = new Team(teamName);
             team.setPrefix(prefix);
             try {
                 team.setColor(ChatColor.valueOf(colorString));
             } catch (IllegalArgumentException e) {
-                Bukkit.getLogger().warning("Invalid color '" + colorString + "' for team " + name + ", defaulting to WHITE.");
+                Bukkit.getLogger().warning("Invalid color '" + colorString + "' for team " + teamName + ", defaulting to WHITE.");
                 team.setColor(ChatColor.WHITE);
             }
             team.setPrivate(isPrivate);
@@ -100,19 +100,27 @@ public class PersistenceManager {
                 for (String uuidString : membersSection.getKeys(false)) {
                     try {
                         UUID uuid = UUID.fromString(uuidString);
+                        if(addedUsers.contains(uuid))throw new Exception("Already in another team");
                         String roleName = membersSection.getString(uuidString, "MEMBER");
                         TeamRole role = TeamRole.valueOf(roleName);
                         team.addMember(uuid);
                         team.setRole(uuid, role);
+                        addedUsers.add(uuid);
                     } catch (Exception e) {
-                        Bukkit.getLogger().warning("Error loading member " + uuidString + " in team " + name + ": " + e.getMessage());
+                        Bukkit.getLogger().warning("Error loading member " + uuidString + " in team " + teamName + ": " + e.getMessage());
                     }
                 }
             }
 
             // Load allies
             List<String> alliesList = teamSection.getStringList("allies");
-            team.getAlliesByName().addAll(alliesList);
+            for(String ally : alliesList){
+                if(ally.equals(teamName)){
+                    Bukkit.getLogger().warning(teamName+ " allied to itself in files");
+                    continue;
+                }
+                team.getAlliesByName().add(ally);
+            }
 
             // Load join requests
             List<String> requestList = teamSection.getStringList("joinRequests");
@@ -120,14 +128,14 @@ public class PersistenceManager {
                 try {
                     team.getJoinRequests().add(UUID.fromString(uuidString));
                 } catch (IllegalArgumentException e) {
-                    Bukkit.getLogger().warning("Invalid UUID in joinRequests: " + uuidString + " for team " + name);
+                    Bukkit.getLogger().warning("Invalid UUID in joinRequests: " + uuidString + " for team " + teamName);
                 }
             }
 
             if(team.getMembers().isEmpty()){
-                Bukkit.getLogger().warning("Team "+name+" is empty and will not be loaded");
+                Bukkit.getLogger().warning("Team "+teamName+" is empty and will not be loaded");
             }else{
-                TeamManager.getTeams().put(name, team);
+                TeamManager.getTeams().put(teamName, team);
             }
         }
     }
