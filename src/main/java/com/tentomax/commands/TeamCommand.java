@@ -251,7 +251,7 @@ public class TeamCommand {
 
         boolean alliesBefore = isAlly(playerTeam,targetTeam);
 
-        playerTeam.getAlliesByName().remove(targetTeam);
+        playerTeam.getAlliesByName().remove(targetTeam.getName());
         player.sendMessage("Removed "+targetTeam+" from allies");
 
         if(alliesBefore){
