@@ -158,15 +158,15 @@ public class TeamCommand {
 
     public static void kick(Player player, String pTarget)throws CException {
         Team playerTeam = assertTeam(player);
-
         Player target = player.getServer().getPlayer(pTarget);
+
+        if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.KICKING))throw new CException("You do not have kicking privileges");
+
         if(target==null) throw new CException("Player "+pTarget+" not found!");
 
         if(target.equals(player)) throw new CException("You can't kick yourself.");
 
         if(!playerTeam.isMember(target.getUniqueId())) throw new CException("Player "+pTarget+" not in your team.");
-
-        if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.KICKING))throw new CException("You do not have kicking privileges");
 
         assertOutranks(playerTeam, player, target);
 
