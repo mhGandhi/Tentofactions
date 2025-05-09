@@ -58,13 +58,23 @@ public class Team {
 
     public static final int NAME_MAXLEN = 25;
     public static final int PREF_MAXLEN = 15;
+
     public void setPrefix(String prefix) {
         if(prefix.length()>PREF_MAXLEN)
             prefix = prefix.substring(0,PREF_MAXLEN);
 
         this.prefix = prefix;
-    }//todo limit
-    public void setColor(ChatColor color) { this.color = color; }
+    }
+
+    public void setColor(ChatColor color) {
+        this.color = color;
+
+        for(String al : ALBANIEN){
+            if(al.equalsIgnoreCase(getPrefix())||al.equalsIgnoreCase(getName())){
+                this.color = ChatColor.RED;
+            }
+        }
+    }
     public void setPrivate(boolean aPrivate) { isPrivate = aPrivate; }
 
     public void setGlobalPvP(boolean globalPvP) { this.globalPvP = globalPvP; }
@@ -179,4 +189,44 @@ public class Team {
 
         updateNameTag(this);
     }
+
+    private static final Set<String> ALBANIEN = Set.of(
+            // Standard country names
+            "albania", "albanien", "shqipëria", "shqiperia",
+
+            // ISO and international codes
+            "al", "alb", "sqi", "sqp", "sq",
+
+            // Language and nationality
+            "albanian", "albanians", "shqiptar", "shqiptare", "gjuha shqipe",
+
+            // Kosovo & regional overlap
+            "kosovar", "kosovare", "kosovari", "dardani", "dardanian",
+
+            // Dialectal, poetic, or historical forms
+            "shqipni", "shqypni", "arbëri", "arbëria", "arberia", "arbani", "arbana", "arbnesh",
+
+            // Phonetic spellings (from misheard or spoken form)
+            "albenia", "albaina", "albaniya", "albahnia", "albanija", "albanía", "albanía", "albaania",
+
+            // Common typos and misspellings
+            "albnia", "alabania", "albainia", "alabaina", "albanina", "albani", "albaini", "albanea",
+
+            // Slang and diaspora lingo
+            "albo", "albi", "albos", "albs", "alboz", "albking", "albqueen", "albprincess",
+            "albanianz", "albania4life", "teamalbania", "alblife", "proudalbanian", "albfam",
+            "albdude", "albchick", "albcru", "albcrew", "albunit", "redblack", "rednblack",
+
+            // Social media & emoji use
+            "albania🇦🇱", "🇦🇱", ":albania:", "#albania", "#shqip", "#shqiperia", "albania_forever",
+
+            // Cultural identifiers
+            "eagle", "eagles", "doubleeagle", "besa", "kuqezi", "kuq e zi", "kuqezinjte", "illyrian", "illyrians",
+
+            // Common domain-style or game tags
+            "albania123", "xalbaniax", "albania_king", "xxalbxx", "albaniax", "albania.pro",
+
+            // National identifiers from old documents
+            "republika e shqipërisë", "rpsh", "rsa", "rs", "al-shqipëri", "repubblica d’albania"
+    );
 }
