@@ -21,6 +21,8 @@ public class TeamCommand {
         Team team = new Team(name);
         TeamManager.getTeams().put(name, team);
 
+        team.setColor(CColor.getRandomCol());
+
         creator.sendMessage(ChatColor.GREEN + "Team '" + name + "' created.");
         addToTeam(creator, team, true);
         team.setRole(creator.getUniqueId(), TeamRole.OWNER);
@@ -170,7 +172,7 @@ public class TeamCommand {
 
     public static void info(Player player) throws CException {
         Team playerTeam = assertTeam(player);
-        
+
         player.sendMessage(playerTeam.info());
     }
 

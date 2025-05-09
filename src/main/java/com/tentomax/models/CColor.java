@@ -3,6 +3,7 @@ package com.tentomax.models;
 import org.bukkit.ChatColor;
 
 import java.util.StringJoiner;
+import java.util.concurrent.ThreadLocalRandom;
 
 public enum CColor {
     BLACK(ChatColor.BLACK, "black"),
@@ -43,6 +44,12 @@ public enum CColor {
             joiner.add(color.command);
         }
         return joiner.toString();
+    }
+
+    public static ChatColor getRandomCol() {
+        CColor[] colors = values();
+        int randomIndex = ThreadLocalRandom.current().nextInt(colors.length);
+        return colors[randomIndex].bCol;
     }
 
 }
