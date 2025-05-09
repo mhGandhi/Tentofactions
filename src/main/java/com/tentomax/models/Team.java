@@ -144,7 +144,7 @@ public class Team {
         StringBuilder ret = new StringBuilder();
         ret.append("--------------------------------------------\n");
         ret.append("Team Info:\n");
-        ret.append("Name: ").append(this.toString()).append("\n");
+        ret.append("Name: ").append(this).append("\n");
         ret.append(this.isPrivate()?"Private":"Public").append("\n");
         ret.append("Prefix -> ").append(this.getPrefix()).append("\n");
         ret.append("PVP: [global: ").append(this.isGlobalPvP())

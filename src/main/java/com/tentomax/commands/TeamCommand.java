@@ -27,7 +27,7 @@ public class TeamCommand {
 
         team.setColor(CColor.getRandomCol());
 
-        creator.sendMessage(ChatColor.GREEN + "Team '" + name + "' created.");
+        creator.sendMessage(ChatColor.GREEN + "Team '" + team + "' created.");
         addToTeam(creator, team, true);
         team.setRole(creator.getUniqueId(), TeamRole.OWNER);
     }
@@ -39,7 +39,7 @@ public class TeamCommand {
 
         if (team.isPrivate()) {
             team.getJoinRequests().add(player.getUniqueId());
-            player.sendMessage(ChatColor.YELLOW + "Join request sent to " + teamName + ".");
+            player.sendMessage(ChatColor.YELLOW + "Join request sent to " + team + ".");
             team.sendMessage(ChatColor.GREEN+"Join request from "+player.getName(), Privilege.ACCEPTING);
         } else {
             addToTeam(player, team, true);
@@ -50,7 +50,7 @@ public class TeamCommand {
         if(TeamManager.playerInTeam(player))throw new CException("Already in a Team");
         if(broadcastMessage){
             pTeam.sendMessage(ChatColor.GREEN + player.getName() + " joined team.");
-            player.sendMessage(ChatColor.GREEN + "Joined team " + pTeam.getName() + ".");
+            player.sendMessage(ChatColor.GREEN + "Joined team " + pTeam + ".");
 
         }
         pTeam.addMember(player.getUniqueId());
@@ -216,7 +216,7 @@ public class TeamCommand {
 
         if (playerTeam.getJoinRequests().remove(target.getUniqueId())) {
             player.sendMessage(ChatColor.YELLOW + "Rejected " + target.getName() + "'s join request.");
-            target.sendMessage(ChatColor.RED + "Your join request to " + playerTeam.getName() + " was rejected.");
+            target.sendMessage(ChatColor.RED + "Your join request to " + playerTeam + " was rejected.");
         } else {
             throw new CException("No join request from "+pTarget+".");
         }
