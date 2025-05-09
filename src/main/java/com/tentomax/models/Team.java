@@ -26,8 +26,8 @@ public class Team {
     }
 
     private boolean globalPvP = true;
-    private boolean teamPvP = false;
-    private boolean allyPvP = false;
+    private boolean teamPvP = true;
+    private boolean allyPvP = true;
 
     public Team(String name) {
         this.name = name;
