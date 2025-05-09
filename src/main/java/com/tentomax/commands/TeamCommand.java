@@ -181,6 +181,12 @@ public class TeamCommand {
         player.sendMessage(playerTeam.info());
     }
 
+    public static void info(Player player, String pTeam) throws CException {
+        Team team = assertTeam(pTeam);
+
+        player.sendMessage(team.info());
+    }
+
 
     public static void accept(Player player, String pTarget) throws CException{
         Team playerTeam = assertTeam(player);

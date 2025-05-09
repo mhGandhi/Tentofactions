@@ -110,8 +110,17 @@ public class BrigadierCommands {
                         .executes(ctx -> {
                             return handleCommand(
                                     ctx.getSource(),
-                                    TeamCommand::info);//todo for other teams aswell
-                        }))
+                                    TeamCommand::info);
+                        })
+                        .then(Commands.argument("team", StringArgumentType.word())
+                                .suggests(getOtherTeamsSuggestor())
+                                .executes(ctx -> {
+                                    return handleCommand(
+                                            ctx.getSource(),
+                                            (player)-> info(player, getString(ctx, "team")));
+                                })
+                        )
+                )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("kick")
                         .then(Commands.argument("player", StringArgumentType.word())
@@ -232,7 +241,7 @@ public class BrigadierCommands {
     }
 
     private static int handleCommand(CommandSourceStack ctx, Command command) {
-        if (!(ctx.getSender() instanceof Player player)) {
+        if (!(ctx.getExecutor() instanceof Player player)) {
             return mustBePlayer(ctx);
         }
 

@@ -141,10 +141,12 @@ public class Team {
     }
 
     public String info(){
-        StringBuilder ret = new StringBuilder(this.getColor() + "Team Info:\n");
-        ret.append("Name -> ").append(this.getName()).append("\n");
+        StringBuilder ret = new StringBuilder();
+        ret.append("--------------------------------------------\n");
+        ret.append("Team Info:\n");
+        ret.append("Name: ").append(this.getName()).append("\n");
+        ret.append(this.isPrivate()?"Private":"Public").append("\n");
         ret.append("Prefix -> ").append(this.getPrefix()).append("\n");
-        ret.append("Private -> ").append(this.isPrivate()).append("\n");
         ret.append("PVP: [global: ").append(this.isGlobalPvP())
                 .append("] [team: ").append(this.isTeamPvP())
                 .append("] [ally: ").append(this.isAllyPvP()).append("]\n");
@@ -158,22 +160,33 @@ public class Team {
             }
         }
 
-        ret.append("Join Requests:\n");
-        for (UUID request : this.getJoinRequests()) {
-            Player pl = Bukkit.getPlayer(request);
-            if (pl != null) {
-                ret.append(" - ").append(pl.getName()).append("\n");
+        Set<UUID> joinRequests = this.getJoinRequests();
+        if(!joinRequests.isEmpty()){
+            ret.append("Join Requests:\n");
+            for (UUID request : this.getJoinRequests()) {
+                Player pl = Bukkit.getPlayer(request);
+                if (pl != null) {
+                    ret.append(" - ").append(pl.getName()).append("\n");
+                }
             }
         }
 
-        ret.append("Allies:\n");
-        for (Team team : getAllies(this)) {
-            ret.append(" - ").append(team.getName()).append("\n");
+        Set<Team> allies = getAllies(this);
+        if(!allies.isEmpty()){
+            ret.append("Allies:\n");
+            for (Team team : getAllies(this)) {
+                ret.append(" - ").append(team.getName()).append("\n");
+            }
         }
-        ret.append("Pending Allies:\n");
-        for (String team : this.getAlliesByName()) {
-            ret.append(" - ").append(team).append("\n");
+
+        Set<String> alliesByName = this.getAlliesByName();
+        if(!alliesByName.isEmpty()){
+            ret.append("Pending Allies:\n");
+            for (String team : alliesByName) {
+                ret.append(" - ").append(team).append("\n");
+            }
         }
+        ret.append("--------------------------------------------\n");
 
         return ret.toString();
     }
@@ -190,7 +203,7 @@ public class Team {
         updateNameTag(this);
     }
 
-    private static final Set<String> ALBANIEN = Set.of(
+    private static final List<String> ALBANIEN = List.of(
             // Standard country names
             "albania", "albanien", "shqipëria", "shqiperia",
 
