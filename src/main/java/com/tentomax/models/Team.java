@@ -162,6 +162,6 @@ public class Team {
 
     @Override
     public String toString() {
-        return getName();
+        return getColor()+getName()+ChatColor.RESET;
     }
 }
