@@ -10,6 +10,8 @@ import org.bukkit.entity.Player;
 import java.util.UUID;
 
 import static com.tentomax.managers.TeamManager.*;
+import static com.tentomax.models.Team.NAME_MAXLEN;
+import static com.tentomax.models.Team.PREF_MAXLEN;
 
 public class TeamCommand {
 
@@ -17,6 +19,8 @@ public class TeamCommand {
     public static void createTeam(Player creator, String name) throws CException {
         if(TeamManager.playerInTeam(creator)) throw new CException("Already in a Team");
         if (TeamManager.getTeams().containsKey(name)) throw new CException("Team \""+name+"\" already exists");
+
+        if(name.length()> NAME_MAXLEN) throw new CException("Team name exceeds max length of "+NAME_MAXLEN);
 
         Team team = new Team(name);
         TeamManager.getTeams().put(name, team);
@@ -78,6 +82,7 @@ public class TeamCommand {
         try{
             switch (ta) {
                 case PREFIX:
+                    if(value.length()>PREF_MAXLEN)throw new CException("Prefix exceeds max length of "+PREF_MAXLEN);
                     playerTeam.setPrefix(value);
                     updateNameTag(playerTeam);
                     break;
