@@ -170,7 +170,7 @@ public class TeamCommand {
 
         assertOutranks(playerTeam, player, target);
 
-        leaveTeam(player, false);
+        leaveTeam(target, false);
         playerTeam.sendMessage(ChatColor.GREEN + target.getName() + " has been kicked from the team.");
         target.sendMessage(ChatColor.RED + "You were kicked from the team.");
     }
