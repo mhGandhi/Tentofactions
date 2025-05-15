@@ -131,7 +131,7 @@ public class BrigadierCommands {
                                             (player)-> kick(player, getString(ctx, "targetPlayer")));
                                 })
                         )//.executes(ctx -> missingArg(ctx.getSource()))
-                        )
+                )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("accept")
                         .then(Commands.argument("player", StringArgumentType.word())
