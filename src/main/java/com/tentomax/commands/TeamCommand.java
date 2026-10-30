@@ -158,19 +158,19 @@ public class TeamCommand {
 
     public static void kick(Player player, String pTarget)throws CException {
         Team playerTeam = assertTeam(player);
-
         Player target = player.getServer().getPlayer(pTarget);
+
+        if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.KICKING))throw new CException("You do not have kicking privileges");
+
         if(target==null) throw new CException("Player "+pTarget+" not found!");
 
         if(target.equals(player)) throw new CException("You can't kick yourself.");
 
         if(!playerTeam.isMember(target.getUniqueId())) throw new CException("Player "+pTarget+" not in your team.");
 
-        if(!playerTeam.hasPrivilege(player.getUniqueId(), Privilege.KICKING))throw new CException("You do not have kicking privileges");
-
         assertOutranks(playerTeam, player, target);
 
-        leaveTeam(player, false);
+        leaveTeam(target, false);
         playerTeam.sendMessage(ChatColor.GREEN + target.getName() + " has been kicked from the team.");
         target.sendMessage(ChatColor.RED + "You were kicked from the team.");
     }
@@ -251,7 +251,7 @@ public class TeamCommand {
 
         boolean alliesBefore = isAlly(playerTeam,targetTeam);
 
-        playerTeam.getAlliesByName().remove(targetTeam);
+        playerTeam.getAlliesByName().remove(targetTeam.getName());
         player.sendMessage("Removed "+targetTeam+" from allies");
 
         if(alliesBefore){

@@ -17,6 +17,19 @@ public class PersistenceManager {
     private static final YamlConfiguration dataConfig = YamlConfiguration.loadConfiguration(dataFile);
 
     public static void saveTeams() {
+        // Ensure directory and file exist
+        try {
+            if (!dataFile.exists()) {
+                dataFile.getParentFile().mkdirs();
+                dataFile.createNewFile();
+            }
+        } catch (IOException e) {
+            Bukkit.getLogger().severe("Failed to create data file: " + e.getMessage());
+            return;
+        }
+
+        // Clear previous teams section if exists
+        dataConfig.set("teams", null);
         ConfigurationSection teamsSection = dataConfig.createSection("teams");
 
         for (Map.Entry<String, Team> entry : TeamManager.getTeams().entrySet()) {
@@ -24,7 +37,7 @@ public class PersistenceManager {
             Team team = entry.getValue();
 
             String path = "teams." + key;
-            ConfigurationSection teamSection = dataConfig.createSection(path);
+            ConfigurationSection teamSection = teamsSection.createSection(key);
 
             teamSection.set("name", team.getName());
             teamSection.set("prefix", team.getPrefix());
@@ -54,20 +67,23 @@ public class PersistenceManager {
         try {
             dataConfig.save(dataFile);
         } catch (IOException e) {
-            Bukkit.getLogger().severe("Failed to save teams: " + e.getMessage());
+            Bukkit.getLogger().severe("Failed to save teams to file: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
 
     public static void loadTeams() {
+        TeamManager.getTeams().clear();
         Set<UUID> addedUsers = new HashSet<>();
 
-
-        TeamManager.getTeams().clear();
-
-        ConfigurationSection teamsSection = dataConfig.getConfigurationSection("teams");
-        if (teamsSection == null) return;
+        // Reload configuration from file
+        YamlConfiguration loadedConfig = YamlConfiguration.loadConfiguration(dataFile);
+        ConfigurationSection teamsSection = loadedConfig.getConfigurationSection("teams");
+        if (teamsSection == null) {
+            Bukkit.getLogger().warning("No teams found in file.");
+            return;
+        }
 
         for (String key : teamsSection.getKeys(false)) {
             ConfigurationSection teamSection = teamsSection.getConfigurationSection(key);
@@ -84,9 +100,9 @@ public class PersistenceManager {
             Team team = new Team(teamName);
             team.setPrefix(prefix);
             try {
-                team.setColor(ChatColor.valueOf(colorString));
+                team.setColor(ChatColor.valueOf(colorString.toUpperCase()));
             } catch (IllegalArgumentException e) {
-                Bukkit.getLogger().warning("Invalid color '" + colorString + "' for team " + teamName + ", defaulting to WHITE.");
+                Bukkit.getLogger().warning("Invalid color '" + colorString + "' for team " + teamName + ". Defaulting to WHITE.");
                 team.setColor(ChatColor.WHITE);
             }
             team.setPrivate(isPrivate);
@@ -100,44 +116,48 @@ public class PersistenceManager {
                 for (String uuidString : membersSection.getKeys(false)) {
                     try {
                         UUID uuid = UUID.fromString(uuidString);
-                        if(addedUsers.contains(uuid))throw new Exception("Already in another team");
+                        if (!addedUsers.add(uuid)) {
+                            throw new IllegalStateException("Player is already in another team");
+                        }
+
                         String roleName = membersSection.getString(uuidString, "MEMBER");
-                        TeamRole role = TeamRole.valueOf(roleName);
+                        TeamRole role = TeamRole.valueOf(roleName.toUpperCase());
                         team.addMember(uuid);
                         team.setRole(uuid, role);
-                        addedUsers.add(uuid);
                     } catch (Exception e) {
-                        Bukkit.getLogger().warning("Error loading member " + uuidString + " in team " + teamName + ": " + e.getMessage());
+                        Bukkit.getLogger().warning("Failed to load member " + uuidString + " in team " + teamName + ": " + e.getMessage());
                     }
                 }
             }
 
             // Load allies
-            List<String> alliesList = teamSection.getStringList("allies");
-            for(String ally : alliesList){
-                if(ally.equals(teamName)){
-                    Bukkit.getLogger().warning(teamName+ " allied to itself in files");
+            List<String> allies = teamSection.getStringList("allies");
+            for (String ally : allies) {
+                if (ally.equals(teamName)) {
+                    Bukkit.getLogger().warning("Team " + teamName + " cannot ally with itself.");
                     continue;
                 }
                 team.getAlliesByName().add(ally);
             }
 
             // Load join requests
-            List<String> requestList = teamSection.getStringList("joinRequests");
-            for (String uuidString : requestList) {
+            List<String> requests = teamSection.getStringList("joinRequests");
+            for (String uuidString : requests) {
                 try {
                     team.getJoinRequests().add(UUID.fromString(uuidString));
                 } catch (IllegalArgumentException e) {
-                    Bukkit.getLogger().warning("Invalid UUID in joinRequests: " + uuidString + " for team " + teamName);
+                    Bukkit.getLogger().warning("Invalid UUID in joinRequests for team " + teamName + ": " + uuidString);
                 }
             }
 
-            if(team.getMembers().isEmpty()){
-                Bukkit.getLogger().warning("Team "+teamName+" is empty and will not be loaded");
-            }else{
+            // Only add team if it has members
+            if (team.getMembers().isEmpty()) {
+                Bukkit.getLogger().warning("Team " + teamName + " has no members and will be skipped.");
+            } else {
                 TeamManager.getTeams().put(teamName, team);
             }
         }
     }
+
 
 }

@@ -25,7 +25,7 @@ public class ChatListener implements Listener {
         if (team == null) return;
         event.setCancelled(true);
 
-        String message = team.getColor() + "[" + team.getPrefix() + "]"+ChatColor.RESET+" "+ player.getName() +" | "+ event.getMessage();
+        String message = team.getColor() + "[" + team.getPrefix() + "]"+ChatColor.RESET+" <"+ player.getName() +"> "+ event.getMessage();
 
         ChatMode mode = ChatManager.getChatMode(player.getUniqueId());
 

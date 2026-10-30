@@ -123,15 +123,15 @@ public class BrigadierCommands {
                 )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("kick")
-                        .then(Commands.argument("player", StringArgumentType.word())
+                        .then(Commands.argument("targetPlayer", StringArgumentType.word())
                                 .suggests(getOneRankLessSuggestor())
                                 .executes(ctx -> {
                                     return handleCommand(
                                             ctx.getSource(),
-                                            (player)-> kick(player, getString(ctx, "player")));
+                                            (player)-> kick(player, getString(ctx, "targetPlayer")));
                                 })
                         )//.executes(ctx -> missingArg(ctx.getSource()))
-                        )
+                )
 
                 .then(LiteralArgumentBuilder.<CommandSourceStack>literal("accept")
                         .then(Commands.argument("player", StringArgumentType.word())
